@@ -10,6 +10,8 @@
 #include <freeglut.h>
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 
  /******************************************************************************
@@ -62,6 +64,13 @@ void think(void);
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
 
+ // GROUND SETUP
+
+#define NUM_GVERTICES 10
+ // x vertices constant, randomise y vertices
+GLfloat gxVertices[NUM_GVERTICES] = {-1.0, -0.9, -0.8, -0.7, -0.6, -0.1, 0.2, 0.5, 0.7, 1.0};
+GLfloat gyVertices[NUM_GVERTICES];
+
  /******************************************************************************
   * Entry Point (don't put anything except the main function here)
   ******************************************************************************/
@@ -72,7 +81,7 @@ void main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(1000, 800);
-	glutCreateWindow("Animation");
+	glutCreateWindow("2D Snow Scene");
 
 	// Set up the scene.
 	init();
@@ -106,6 +115,27 @@ void main(int argc, char** argv)
  */
 void display(void)
 {
+	// clear screen
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// enable smooth lines
+	glEnable(GL_LINE_SMOOTH);
+
+	// draw ground
+	glBegin(GL_QUAD_STRIP);
+
+	for (int i = 0; i < NUM_GVERTICES; i++) {
+		// set color to dark green (76, 139, 100) RGB255
+		glColor3f(76.0 / 255.0, 139.0 / 255.0, 100.0 / 255.0);
+		// bottom vertex
+		glVertex2f(gxVertices[i], -1.0);
+		// set color to light green (137, 172, 115)
+		glColor3f(137.0 / 255.0, 172.0 / 255.0, 115.0 / 255.0);
+		// top vertex
+		glVertex2f(gxVertices[i], gyVertices[i]);
+	}
+
+	glutSwapBuffers();
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR DRAWING CODE
 
@@ -180,6 +210,25 @@ void idle(void)
  */
 void init(void)
 {
+	//TEMPORARY set bg color to be black for easier viewing of ground
+	glClearColor(0, 0, 0, 1.0);
+
+	// set drawing to white
+	glColor3f(1.0, 1.0, 1.0);
+
+	// set window mode to 2d orthographic and set coordinate system
+	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
+
+
+	// INITIALISE GROUND RANDOMISER
+
+	// seed random
+	srand(time(0));
+
+	// randomise y value of top ground vertices
+	for (int i = 0; i < NUM_GVERTICES; i++) {
+		gyVertices[i] = (rand() % (-50 - (-65) + 1) - 65) * 0.01;
+	}
 }
 
 /*
