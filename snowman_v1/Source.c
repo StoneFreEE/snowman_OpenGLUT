@@ -60,8 +60,10 @@ void main(int argc, char** argv);
 void init(void);
 void think(void);
 
-void drawGround(void);
+void drawSky(void);
+
 void initGround(void);
+void drawGround(void);
 
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
@@ -123,6 +125,8 @@ void display(void)
 
 	// enable smooth lines
 	glEnable(GL_LINE_SMOOTH);
+
+	drawSky();
 
 	drawGround();
 
@@ -201,17 +205,14 @@ void idle(void)
  */
 void init(void)
 {
+	// seed random
+	srand(time(0));
+
 	//TEMPORARY set bg color to be black for easier viewing of ground
 	glClearColor(0, 0, 0, 1.0);
 
-	// set drawing to white
-	glColor3f(1.0, 1.0, 1.0);
-
 	// set window mode to 2d orthographic and set coordinate system
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
-
-	// seed random
-	srand(time(0));
 
 	// initialise ground
 	initGround();
@@ -268,6 +269,27 @@ void think(void)
 	*/
 }
 
+void drawSky() {
+	// draw sky
+	glBegin(GL_POLYGON);
+
+	// set color to light blue (194, 250, 252) RGB255
+	glColor3f(194.0 / 255.0, 250.0 / 255.0, 252.0 / 255.0);
+	// bottom left vertex
+	glVertex2f(-1.0, -1.0);
+	// bottom right vertex
+	glVertex2f(1.0, -1.0);
+	
+	// set color to dark blue (129, 192, 205) RGB255
+	glColor3f(129.0 / 255.0, 192.0 / 255.0, 205.0 / 255.0);
+	// top right vertex
+	glVertex2f(1.0, 1.0);
+	// top left vertex
+	glVertex2f(-1.0, 1.0);
+
+	glEnd();
+}
+
 void initGround() {
 	// randomise y value of top ground vertices
 	for (int i = 0; i < NUM_GVERTICES; i++) {
@@ -284,11 +306,12 @@ void drawGround(void) {
 		glColor3f(76.0 / 255.0, 139.0 / 255.0, 100.0 / 255.0);
 		// bottom vertex
 		glVertex2f(gxVertices[i], -1.0);
-		// set color to light green (137, 172, 115)
+		// set color to light green (137, 172, 115) RGB255
 		glColor3f(137.0 / 255.0, 172.0 / 255.0, 115.0 / 255.0);
 		// top vertex
 		glVertex2f(gxVertices[i], gyVertices[i]);
 	}
+	glEnd();
 }
 
 /******************************************************************************/

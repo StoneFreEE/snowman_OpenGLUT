@@ -1,13 +1,19 @@
 ﻿  Source.c
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(74,37): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(214,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(274,53): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(76,37): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(209,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(277,25): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(277,40): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(277,55): warning C4305: 'function': truncation from 'double' to 'GLfloat'
 C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(284,25): warning C4305: 'function': truncation from 'double' to 'GLfloat'
 C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(284,40): warning C4305: 'function': truncation from 'double' to 'GLfloat'
 C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(284,55): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(288,26): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(288,41): warning C4305: 'function': truncation from 'double' to 'GLfloat'
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(288,56): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(296,53): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(306,25): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(306,40): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(306,55): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(310,26): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(310,41): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Source.c(310,56): warning C4305: 'function': truncation from 'double' to 'GLfloat'
   snowman_v1.vcxproj -> C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Debug\snowman_v1.exe
   C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\freeglut\bin\freeglut.dll
   1 File(s) copied
