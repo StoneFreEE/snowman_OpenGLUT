@@ -60,6 +60,9 @@ void main(int argc, char** argv);
 void init(void);
 void think(void);
 
+void drawGround(void);
+void initGround(void);
+
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
@@ -121,19 +124,7 @@ void display(void)
 	// enable smooth lines
 	glEnable(GL_LINE_SMOOTH);
 
-	// draw ground
-	glBegin(GL_QUAD_STRIP);
-
-	for (int i = 0; i < NUM_GVERTICES; i++) {
-		// set color to dark green (76, 139, 100) RGB255
-		glColor3f(76.0 / 255.0, 139.0 / 255.0, 100.0 / 255.0);
-		// bottom vertex
-		glVertex2f(gxVertices[i], -1.0);
-		// set color to light green (137, 172, 115)
-		glColor3f(137.0 / 255.0, 172.0 / 255.0, 115.0 / 255.0);
-		// top vertex
-		glVertex2f(gxVertices[i], gyVertices[i]);
-	}
+	drawGround();
 
 	glutSwapBuffers();
 	/*
@@ -219,16 +210,11 @@ void init(void)
 	// set window mode to 2d orthographic and set coordinate system
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
 
-
-	// INITIALISE GROUND RANDOMISER
-
 	// seed random
 	srand(time(0));
 
-	// randomise y value of top ground vertices
-	for (int i = 0; i < NUM_GVERTICES; i++) {
-		gyVertices[i] = (rand() % (-50 - (-65) + 1) - 65) * 0.01;
-	}
+	// initialise ground
+	initGround();
 }
 
 /*
@@ -280,6 +266,29 @@ void think(void)
 		You can use this same approach to animate other things like color, opacity,
 		brightness of lights, etc.
 	*/
+}
+
+void initGround() {
+	// randomise y value of top ground vertices
+	for (int i = 0; i < NUM_GVERTICES; i++) {
+		gyVertices[i] = (rand() % (-50 - (-65) + 1) - 65) * 0.01;
+	}
+}
+
+void drawGround(void) {
+	// draw ground
+	glBegin(GL_QUAD_STRIP);
+
+	for (int i = 0; i < NUM_GVERTICES; i++) {
+		// set color to dark green (76, 139, 100) RGB255
+		glColor3f(76.0 / 255.0, 139.0 / 255.0, 100.0 / 255.0);
+		// bottom vertex
+		glVertex2f(gxVertices[i], -1.0);
+		// set color to light green (137, 172, 115)
+		glColor3f(137.0 / 255.0, 172.0 / 255.0, 115.0 / 255.0);
+		// top vertex
+		glVertex2f(gxVertices[i], gyVertices[i]);
+	}
 }
 
 /******************************************************************************/
