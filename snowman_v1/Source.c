@@ -65,6 +65,12 @@ void drawSky(void);
 void initGround(void);
 void drawGround(void);
 
+// snowman helper functions
+void drawHead(void);
+void drawLegs(void);
+
+void drawSnowman(void);
+
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
@@ -129,6 +135,8 @@ void display(void)
 	drawSky();
 
 	drawGround();
+
+	drawSnowman();
 
 	glutSwapBuffers();
 	/*
@@ -291,9 +299,16 @@ void drawSky() {
 }
 
 void initGround() {
+
 	// randomise y value of top ground vertices
 	for (int i = 0; i < NUM_GVERTICES; i++) {
-		gyVertices[i] = (rand() % (-50 - (-65) + 1) - 65) * 0.01;
+		// if even, make point higher
+		if (i % 2 == 0) {
+			gyVertices[i] = (rand() % (-30 - (-45) + 1) - 45) * 0.01; // between -0.3 and -0.45
+		}
+		else {
+			gyVertices[i] = (rand() % (-45 - (-50) + 1) - 50) * 0.01; // between -0.45 and -0.5
+		}
 	}
 }
 
@@ -314,4 +329,58 @@ void drawGround(void) {
 	glEnd();
 }
 
+void drawSnowman(void) {
+	drawLegs();
+	drawHead();
+}
+
+void drawLegs(void) {
+	// set line width
+	glLineWidth(27.0f);
+
+	glBegin(GL_LINES);
+
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+
+	// left leg
+	glVertex2f(-0.09, 0.0);
+	glVertex2f(-0.09, -0.6);
+
+	// right leg
+	glVertex2f(0.09, 0.0);
+	glVertex2f(0.09, -0.6);
+
+	// left foot
+	glVertex2f(-0.069, -0.6);
+	glVertex2f(-0.2, -0.61);
+
+	// right foot
+	glVertex2f(0.069, -0.6);
+	glVertex2f(0.2, -0.62);
+
+
+	glEnd();
+}
+
+void drawHead(void) {
+	float radius = 0.2f;
+
+	glBegin(GL_TRIANGLE_FAN);
+
+	// set color to light orange (242, 184, 102)
+	glColor3f(242.0 / 255.0, 184.0 / 255.0, 102.0 / 255.0);
+	glVertex2f(0.0, 0.1);
+
+	for (int theta = 0; theta <= 360; theta += 10)
+	{
+		// set color to orange (239, 143, 60) RGB255
+		glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+		float angle = (float)(theta * 3.14 / 180.0);
+		float x = cos(angle) * radius;
+		float y = sin(angle) * radius + 0.1;
+		glVertex2f(x, y);
+	}
+	glEnd();
+}
 /******************************************************************************/
