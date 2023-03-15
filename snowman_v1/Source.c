@@ -344,12 +344,12 @@ void drawLegs(void) {
 	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
 
 	// left leg
-	glVertex2f(-0.09, 0.0);
-	glVertex2f(-0.09, -0.6);
+	glVertex2f(-0.095, 0.0);
+	glVertex2f(-0.095, -0.6);
 
 	// right leg
-	glVertex2f(0.09, 0.0);
-	glVertex2f(0.09, -0.6);
+	glVertex2f(0.095, 0.0);
+	glVertex2f(0.095, -0.6);
 
 	// left foot
 	glVertex2f(-0.069, -0.6);
@@ -357,7 +357,7 @@ void drawLegs(void) {
 
 	// right foot
 	glVertex2f(0.069, -0.6);
-	glVertex2f(0.2, -0.62);
+	glVertex2f(0.2, -0.61);
 
 
 	glEnd();
