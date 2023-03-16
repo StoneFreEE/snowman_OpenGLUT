@@ -68,6 +68,7 @@ void drawGround(void);
 // snowman helper functions
 void drawHead(void);
 void drawLegs(void);
+void drawArms(void);
 
 void drawSnowman(void);
 
@@ -331,7 +332,63 @@ void drawGround(void) {
 
 void drawSnowman(void) {
 	drawLegs();
+	drawArms();
 	drawHead();
+}
+
+void drawArms(void) {
+	// set line width
+	glLineWidth(22.5f);
+
+	glBegin(GL_LINES);
+
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+
+	// left arm
+	glVertex2f(-0.17, 0.05);
+	glVertex2f(-0.3, -0.22);
+
+	// left hand middle part
+	glVertex2f(-0.35, -0.2);
+	glVertex2f(-0.23, -0.24);
+
+	// left hand left part
+	glVertex2f(-0.33, -0.2);
+	glVertex2f(-0.38, -0.3);
+
+	// left hand right part
+	glVertex2f(-0.24, -0.21);
+	glVertex2f(-0.25, -0.34);
+
+	glEnd();
+
+	// set line width
+	glLineWidth(29.0f);
+
+	glBegin(GL_LINES);
+
+	// right arm
+	glVertex2f(0.17, 0.05);
+	glVertex2f(0.3, -0.22);
+
+	glEnd();
+
+	glBegin(GL_POLYGON);
+
+	// right hand
+	// top point
+	glVertex2f(0.3, -0.18);
+	// right top point
+	glVertex2f(0.42, -0.22);
+	// right bottom point
+	glVertex2f(0.44, -0.35);
+	// left bottom point
+	glVertex2f(0.30, -0.4);
+	// left top point
+	glVertex2f(0.23, -0.29);
+
+	glEnd();
 }
 
 void drawLegs(void) {
@@ -358,7 +415,6 @@ void drawLegs(void) {
 	// right foot
 	glVertex2f(0.069, -0.6);
 	glVertex2f(0.2, -0.61);
-
 
 	glEnd();
 }
