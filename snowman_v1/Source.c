@@ -69,6 +69,9 @@ void drawGround(void);
 void drawHead(void);
 void drawLegs(void);
 void drawArms(void);
+void drawDetails(void);
+
+void drawCircle(GLfloat x, GLfloat y, float radius);
 
 void drawSnowman(void);
 
@@ -334,6 +337,58 @@ void drawSnowman(void) {
 	drawLegs();
 	drawArms();
 	drawHead();
+	drawDetails();
+}
+
+void drawDetails(void) {
+	// set color to black and draw eyes
+	glColor3f(0.0, 0.0, 0.0);
+	// right eye small circle guy
+	drawCircle(-0.18, 0.25, 0.015);
+	// left eye small circle guy
+	drawCircle(-0.215, 0.2, 0.015);
+	// outer big circle eye
+	drawCircle(0.0, 0.1, 0.1);
+	// right hand left eye
+	drawCircle(0.3, -0.3, 0.015);
+	// right hand right eye
+	drawCircle(0.375, -0.27, 0.015);
+
+	// set color to white
+	glColor3f(1.0, 1.0, 1.0);
+	// white big circle eye
+	drawCircle(0.0, 0.1, 0.065);
+
+	// set color to black 
+	glColor3f(0.0, 0.0, 0.0);
+	// black inner big circle eye
+	drawCircle(0.0, 0.1, 0.05);
+
+	// set line width
+	glLineWidth(21.5f);
+
+	// draw bottom of top hat
+	glBegin(GL_LINES);
+
+	// bottom left
+	glVertex2f(-0.1, 0.32);
+	// bottom right
+	glVertex2f(0.1, 0.32);
+
+	glEnd();
+
+	// draw top of top hat
+	glBegin(GL_POLYGON);
+
+	// bottom left
+	glVertex2f(-0.07, 0.33);
+	// bottom right
+	glVertex2f(0.07, 0.34);
+	// top right
+	glVertex2f(0.08, 0.44);
+	// top left
+	glVertex2f(-0.08, 0.44);
+	glEnd();
 }
 
 void drawArms(void) {
@@ -342,11 +397,12 @@ void drawArms(void) {
 
 	glBegin(GL_LINES);
 
+	// left arm
+	// set color to red (232, 93, 46) RGB255
+	glColor3f(232.0 / 255.0, 93.0 / 255.0, 46.0 / 255.0);
+	glVertex2f(-0.17, 0.05);
 	// set color to orange (239, 143, 60) RGB255
 	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
-
-	// left arm
-	glVertex2f(-0.17, 0.05);
 	glVertex2f(-0.3, -0.22);
 
 	// left hand middle part
@@ -369,7 +425,11 @@ void drawArms(void) {
 	glBegin(GL_LINES);
 
 	// right arm
+		// set color to red (232, 93, 46) RGB255
+	glColor3f(232.0 / 255.0, 93.0 / 255.0, 46.0 / 255.0);
 	glVertex2f(0.17, 0.05);
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
 	glVertex2f(0.3, -0.22);
 
 	glEnd();
@@ -401,11 +461,19 @@ void drawLegs(void) {
 	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
 
 	// left leg
+			// set color to red (232, 93, 46) RGB255
+	glColor3f(232.0 / 255.0, 93.0 / 255.0, 46.0 / 255.0);
 	glVertex2f(-0.095, 0.0);
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
 	glVertex2f(-0.095, -0.6);
 
 	// right leg
+				// set color to red (232, 93, 46) RGB255
+	glColor3f(232.0 / 255.0, 93.0 / 255.0, 46.0 / 255.0);
 	glVertex2f(0.095, 0.0);
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
 	glVertex2f(0.095, -0.6);
 
 	// left foot
@@ -419,9 +487,29 @@ void drawLegs(void) {
 	glEnd();
 }
 
+void drawCircle(GLfloat x, GLfloat y, float radius) {
+	glBegin(GL_TRIANGLE_FAN);
+
+	glVertex2f(x, y);
+
+	for (int theta = 0; theta <= 360; theta += 10)
+	{
+		float angle = (float)(theta * 3.14 / 180.0);
+		float finalX = cos(angle) * radius + x;
+		float finalY = sin(angle) * radius + y;
+		glVertex2f(finalX, finalY);
+	}
+	glEnd();
+}
+
 void drawHead(void) {
+	// set color to orange (239, 143, 60) RGB255
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+	drawCircle(-0.16, 0.2, 0.08);
+
 	float radius = 0.2f;
 
+	// big circle guy
 	glBegin(GL_TRIANGLE_FAN);
 
 	// set color to light orange (242, 184, 102)
