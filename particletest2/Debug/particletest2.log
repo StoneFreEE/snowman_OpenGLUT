@@ -1,0 +1,11 @@
+﻿  Source.c
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(228,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(278,58): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(280,52): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(282,55): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(288,74): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(290,54): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\Source.c(293,71): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  particletest2.vcxproj -> C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Debug\particletest2.exe
+  C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest2\freeglut\bin\freeglut.dll
+  1 File(s) copied

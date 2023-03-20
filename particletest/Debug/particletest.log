@@ -1,0 +1,8 @@
+﻿  Source.c
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest\Source.c(237,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest\Source.c(275,74): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest\Source.c(277,54): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest\Source.c(280,71): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  particletest.vcxproj -> C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Debug\particletest.exe
+  C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletest\freeglut\bin\freeglut.dll
+  1 File(s) copied
