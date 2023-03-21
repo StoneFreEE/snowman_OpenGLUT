@@ -71,13 +71,15 @@ void spawnParticle();
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
-#define MAX_PARTICLES 150
+#define MAX_PARTICLES 75
 
 int lastUsedParticle = -1;
 int particlesToSpawn = 1; // initial number of particles to spawn per frame
 int particlesSpawned = 0; // number of particles spawned this frame
 int particleSystemActive = 1; // particle system initally inactive
 
+float particleSpawnTimer = 0.0f;
+float particleSpawnRate = 0.3f;
 
 typedef struct {
 	float x;
@@ -91,7 +93,18 @@ typedef struct {
 	boolean active;
 	float life; // total time particle has been alive
 	float alpha; // transparency
+	GLfloat colour[3];
 }  Particle_t;
+
+char text = '0';
+
+
+GLfloat colours[5][3] = { {168.0f / 255.0f, 100 / 255.0f,253 / 255.0f}, // purple
+						  {41 / 255.0f, 205 / 255.0f, 255 / 255.0f}, // blue
+						  {120 / 255.0f,255 / 255.0f,68 / 255.0f}, // green
+						  {255 / 255.0f, 113 / 255.0f,141 / 255.0f}, // red
+						  {253 / 255.0f, 255 / 255.0f,106 / 255.0f} // yellow
+};
 
 float pAlpha = 1.0f;
 float deltaTime = 0;
@@ -143,6 +156,16 @@ void display(void)
 {
 
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Set color to white
+	glColor3f(1.0, 1.0, 1.0);
+
+	// Set the position for the text
+	glRasterPos2f(0.3, 0.9);
+
+	// Render the text using GLUT's bitmap font
+	glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text); // Draw each character of the string
+
 	drawParticleSystem();
 	glutSwapBuffers();
 	/*
@@ -185,6 +208,7 @@ void keyPressed(unsigned char key, int x, int y)
 		}
 		else {
 			particleSystemActive = 1;
+			particleSpawnRate = 0.3f;
 		}
 		break;
 
@@ -262,12 +286,17 @@ int findUnusedParticle() {
 	return 0; // All particles are in use, override the first one
 }
 void spawnParticle(int index) {
+	int colourindex = rand() % 5;
+
 	particleSystem[index].position.x = (double)rand() / ((double)RAND_MAX / 2) - 1;
 	particleSystem[index].position.y = 1.0f;
-	particleSystem[index].dy = (double)rand() / RAND_MAX * 0.5 + 0.5; // random num between 0.5-1.0
+	particleSystem[index].size = ((double)rand() / RAND_MAX) * (10.0 - 5.0) + 5.0;
+	particleSystem[index].dy = ((double)rand() / RAND_MAX * 0.4 + 0.1) * particleSystem[index].size / 10; // random num between 0.1-0.4 * particle size
 	particleSystem[index].life = 0.0f;
 	particleSystem[index].alpha = 1.0f;
-	particleSystem[index].size = ((double)rand() / RAND_MAX) * (10.0 - 5.0) + 5.0;
+	for (int i = 0; i < 3; i++) {
+		particleSystem[index].colour[i] = colours[colourindex][i];
+	}
 	particleSystem[index].active = 1;
 }
 
@@ -275,29 +304,29 @@ void updateParticleSystem(float deltaTime) {
 
 	int unusedParticle = findUnusedParticle();
 
-	// Gradually emit particles until MAX_PARTICLES is reached
-	if (lastUsedParticle == -1) {
-		if (particlesSpawned < MAX_PARTICLES) {
-			spawnParticle(unusedParticle);
-			particlesSpawned++;
-		}
-		else {
-			lastUsedParticle = unusedParticle;
-		}
-	}
-	// Recycle particles
-	else {
+	if (particleSystemActive) {
+		particleSpawnTimer += deltaTime;
 		int i = lastUsedParticle;
+
 		do {
 			i = (i + 1) % MAX_PARTICLES;
-			if (!particleSystem[i].active) {
+			if (!particleSystem[i].active && particleSpawnTimer >= particleSpawnRate) {
 				spawnParticle(i);
+				particleSpawnRate -= deltaTime * 0.2f;
+				particleSpawnTimer = 0.0f;
+				if (particleSpawnRate < 0.0f) {
+					particleSpawnRate = 0.0f; // Ensure particle spawn rate doesn't become negative
+				}
+
+				text = '2';
+
 				lastUsedParticle = i;
 				break;
 			}
 		} while (i != lastUsedParticle);
 	}
 
+	// update particle location transparency etc
 	for (int i = 0; i < MAX_PARTICLES; i++) {
 		Particle_t* p = &particleSystem[i];
 		if (p->active) {
@@ -317,7 +346,7 @@ void drawParticleSystem() {
 		if (particleSystem[i].active == 1) {
 			glPointSize(particleSystem[i].size);
 			glBegin(GL_POINTS);
-			glColor4f(1.0f, 1.0f, 1.0f, particleSystem[i].alpha); // gradually fade out particle
+			glColor4f(particleSystem[i].colour[0],particleSystem[i].colour[1], particleSystem[i].colour[2], particleSystem[i].alpha); // gradually fade out particle
 			glVertex2f(particleSystem[i].position.x, particleSystem[i].position.y);
 			glEnd();
 		}

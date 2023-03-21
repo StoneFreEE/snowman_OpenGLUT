@@ -1,8 +1,10 @@
 ﻿  Source.c
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(237,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(265,77): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(267,61): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(270,74): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(164,19): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(164,24): warning C4305: 'function': truncation from 'double' to 'GLfloat'
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(261,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(291,77): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(293,74): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\Source.c(294,98): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   particletesttoggle.vcxproj -> C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\snowman_v1\Debug\particletesttoggle.exe
   C:\Users\64272\Documents\uni\uni stuff yr 2\comp612graphics\612graphics_repos\projectstuff\animation\snowman_project\particletesttoggle\freeglut\bin\freeglut.dll
   1 File(s) copied
