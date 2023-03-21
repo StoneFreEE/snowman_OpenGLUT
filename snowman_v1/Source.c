@@ -69,6 +69,9 @@ void drawParticleSystem();
 int findUnusedParticle();
 void spawnParticle(int index);
 
+void displayDiagnostics(void);
+
+// background drawing functions
 void drawSky(void);
 
 void initGround(void);
@@ -95,6 +98,7 @@ void drawSnowman(void);
 
 int lastUsedParticle = -1;
 int particleSystemActive = 0; // particle system initally inactive
+int particleCounter = 0;
 
 float particleSpawnTimer = 0.0f;
 float spawnDelay = 0.3f;
@@ -190,6 +194,8 @@ void display(void)
 	drawPlatform();
 
 	drawSnowman();
+
+	displayDiagnostics();
 
 	drawParticleSystem();
 
@@ -397,6 +403,10 @@ void updateParticleSystem(float deltaTime) {
 			i = (i + 1) % MAX_PARTICLES;
 			if (!particleSystem[i].active && particleSpawnTimer >= spawnDelay) {
 				spawnParticle(i);
+				// increment particle counter
+				if (particleCounter < MAX_PARTICLES) {
+					particleCounter++;
+				}
 				spawnDelay -= deltaTime * 0.2f;
 				particleSpawnTimer = 0.0f;
 				if (spawnDelay < 0.0f) {
@@ -417,6 +427,7 @@ void updateParticleSystem(float deltaTime) {
 			p->life += deltaTime;
 			if (p->position.y <= -1.0f) {
 				p->active = 0;
+				if (!particleSystemActive) { particleCounter--; };
 			}
 			p->alpha = (p->position.y + 1.0f) / 1.0f;
 		}
@@ -434,6 +445,21 @@ void drawParticleSystem() {
 		}
 	}
 }
+
+
+// DIAGNOSTICS FUNCTION
+void displayDiagnostics(void){
+	char text[256]; // Allocate a buffer to hold the formatted string
+	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n s: toggle confetti\n ESC: exit", particleCounter, MAX_PARTICLES);
+
+	glColor3f(0.0f, 0.0f, 0.0f);
+	// Set the position for the text
+	glRasterPos2f(-0.99f, 0.95f);
+
+	// Render the text 
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text);
+}
+
 
 // BACKGROUND AND CHARACTER FUNCTIONS
 
