@@ -79,7 +79,7 @@ int particlesSpawned = 0; // number of particles spawned this frame
 int particleSystemActive = 1; // particle system initally inactive
 
 float particleSpawnTimer = 0.0f;
-float particleSpawnRate = 0.3f;
+float spawnDelay = 0.3f;
 
 typedef struct {
 	float x;
@@ -208,7 +208,7 @@ void keyPressed(unsigned char key, int x, int y)
 		}
 		else {
 			particleSystemActive = 1;
-			particleSpawnRate = 0.3f;
+			spawnDelay = 0.3f;
 		}
 		break;
 
@@ -310,12 +310,12 @@ void updateParticleSystem(float deltaTime) {
 
 		do {
 			i = (i + 1) % MAX_PARTICLES;
-			if (!particleSystem[i].active && particleSpawnTimer >= particleSpawnRate) {
+			if (!particleSystem[i].active && particleSpawnTimer >= spawnDelay) {
 				spawnParticle(i);
-				particleSpawnRate -= deltaTime * 0.2f;
+				spawnDelay -= deltaTime * 0.2f;
 				particleSpawnTimer = 0.0f;
-				if (particleSpawnRate < 0.0f) {
-					particleSpawnRate = 0.0f; // Ensure particle spawn rate doesn't become negative
+				if (spawnDelay < 0.0f) {
+					spawnDelay = 0.0f; // Ensure particle spawn rate doesn't become negative
 				}
 
 				text = '2';

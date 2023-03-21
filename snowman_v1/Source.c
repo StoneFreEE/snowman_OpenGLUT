@@ -42,6 +42,8 @@ unsigned int frameStartTime = 0;
  // characters typed by the user to lowercase, so the SHIFT key is ignored.
 
 #define KEY_EXIT			27 // Escape key.
+#define KEY_PARTICLE_ONOFF  's' // s key
+
 
 /******************************************************************************
  * GLUT Callback Prototypes
@@ -60,10 +62,19 @@ void main(int argc, char** argv);
 void init(void);
 void think(void);
 
+// PARTICLE SYSTEM FUNCTIONS
+void initParticleSystem();
+void updateParticleSystem(float deltaTime);
+void drawParticleSystem();
+int findUnusedParticle();
+void spawnParticle(int index);
+
 void drawSky(void);
 
 void initGround(void);
 void drawGround(void);
+
+void drawPlatform(void);
 
 // snowman helper functions
 void drawHead(void);
@@ -78,6 +89,42 @@ void drawSnowman(void);
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
+
+ // PARTICLES
+#define MAX_PARTICLES 75
+
+int lastUsedParticle = -1;
+int particleSystemActive = 0; // particle system initally inactive
+
+float particleSpawnTimer = 0.0f;
+float spawnDelay = 0.3f;
+
+typedef struct {
+	float x;
+	float y;
+} Position2;
+
+typedef struct {
+	Position2 position; //x y location of particle
+	float size; // GL point size
+	float dy;   //velocity
+	boolean active;
+	float life; // total time particle has been alive
+	float alpha; // transparency
+	GLfloat colour[3];
+}  Particle_t;
+
+GLfloat colours[5][3] = { {168.0f / 255.0f, 100 / 255.0f,253 / 255.0f}, // purple
+						  {41 / 255.0f, 205 / 255.0f, 255 / 255.0f}, // blue
+						  {120 / 255.0f,255 / 255.0f,68 / 255.0f}, // green
+						  {255 / 255.0f, 113 / 255.0f,141 / 255.0f}, // red
+						  {253 / 255.0f, 255 / 255.0f,106 / 255.0f} // yellow
+};
+
+float pAlpha = 1.0f;
+float deltaTime = 0;
+Particle_t particleSystem[MAX_PARTICLES];
+
 
  // GROUND SETUP
 
@@ -140,7 +187,11 @@ void display(void)
 
 	drawGround();
 
+	drawPlatform();
+
 	drawSnowman();
+
+	drawParticleSystem();
 
 	glutSwapBuffers();
 	/*
@@ -176,6 +227,17 @@ void keyPressed(unsigned char key, int x, int y)
 	case KEY_EXIT:
 		exit(0);
 		break;
+
+	case KEY_PARTICLE_ONOFF:
+		if (particleSystemActive == 1) {
+			particleSystemActive = 0;
+		}
+		else {
+			particleSystemActive = 1;
+			spawnDelay = 0.3f;
+		}
+		break;
+
 	}
 }
 
@@ -217,6 +279,10 @@ void idle(void)
  */
 void init(void)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glutInitDisplayMode(GLUT_RGBA);
+
 	// seed random
 	srand(time(0));
 
@@ -240,6 +306,7 @@ void init(void)
 */
 void think(void)
 {
+	updateParticleSystem(FRAME_TIME_SEC);
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR ANIMATION/SIMULATION CODE
 
@@ -280,6 +347,95 @@ void think(void)
 		brightness of lights, etc.
 	*/
 }
+
+
+
+// PARTICLE SYSTEM FUNCTIONS
+
+int findUnusedParticle() {
+	for (int i = lastUsedParticle + 1; i < MAX_PARTICLES; i++) {
+		if (particleSystem[i].active == 0) {
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	for (int i = 0; i < lastUsedParticle; i++) {
+		if (particleSystem[i].active == 0) {
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	return 0; // All particles are in use, override the first one
+}
+
+void spawnParticle(int index) {
+	int colourindex = rand() % 5;
+
+	particleSystem[index].position.x = (double)rand() / ((double)RAND_MAX / 2) - 1;
+	particleSystem[index].position.y = 1.0f;
+	particleSystem[index].size = ((double)rand() / RAND_MAX) * (10.0 - 5.0) + 5.0;
+	particleSystem[index].dy = ((double)rand() / RAND_MAX * 0.4 + 0.1) * particleSystem[index].size / 10; // random num between 0.1-0.4 * particle size / 10
+	particleSystem[index].life = 0.0f;
+	particleSystem[index].alpha = 1.0f;
+	for (int i = 0; i < 3; i++) {
+		particleSystem[index].colour[i] = colours[colourindex][i];
+	}
+	particleSystem[index].active = 1;
+}
+
+void updateParticleSystem(float deltaTime) {
+
+	int unusedParticle = findUnusedParticle();
+
+	if (particleSystemActive) {
+		particleSpawnTimer += deltaTime;
+		int i = lastUsedParticle;
+
+		do {
+			i = (i + 1) % MAX_PARTICLES;
+			if (!particleSystem[i].active && particleSpawnTimer >= spawnDelay) {
+				spawnParticle(i);
+				spawnDelay -= deltaTime * 0.2f;
+				particleSpawnTimer = 0.0f;
+				if (spawnDelay < 0.0f) {
+					spawnDelay = 0.0f; // Ensure particle spawn rate doesn't become negative
+				}
+
+				lastUsedParticle = i;
+				break;
+			}
+		} while (i != lastUsedParticle);
+	}
+
+	// update particle location transparency etc
+	for (int i = 0; i < MAX_PARTICLES; i++) {
+		Particle_t* p = &particleSystem[i];
+		if (p->active) {
+			p->position.y -= p->dy * deltaTime;
+			p->life += deltaTime;
+			if (p->position.y <= -1.0f) {
+				p->active = 0;
+			}
+			p->alpha = (p->position.y + 1.0f) / 1.0f;
+		}
+	}
+}
+
+void drawParticleSystem() {
+	for (int i = 0; i < MAX_PARTICLES; i++) {
+		if (particleSystem[i].active == 1) {
+			glPointSize(particleSystem[i].size);
+			glBegin(GL_POINTS);
+			glColor4f(particleSystem[i].colour[0], particleSystem[i].colour[1], particleSystem[i].colour[2], particleSystem[i].alpha); // gradually fade out particle
+			glVertex2f(particleSystem[i].position.x, particleSystem[i].position.y);
+			glEnd();
+		}
+	}
+}
+
+// BACKGROUND AND CHARACTER FUNCTIONS
 
 void drawSky() {
 	// draw sky
@@ -331,6 +487,39 @@ void drawGround(void) {
 		glVertex2f(gxVertices[i], gyVertices[i]);
 	}
 	glEnd();
+}
+
+void drawPlatform(void) {
+	// draw bottom
+	glBegin(GL_POLYGON);
+	// set colour to dark dull green
+	glColor3f(65.0 / 255.0, 97.0 / 255.0, 65.0 / 255.0);
+	//bottom left
+	glVertex2f(-0.4, -1.0f);
+	// bottom right
+	glVertex2f(0.4, -1.0f);
+	// top right
+	glVertex2f(0.4, -0.7f);
+	// top left
+	glVertex2f(-0.4, -0.7f);
+
+	glEnd();
+
+	// draw top
+	glBegin(GL_POLYGON);
+	// set colour to dull green
+	glColor3f(93.0 / 255.0, 129.0 / 255.0, 93.0 / 255.0);
+	//bottom left
+	glVertex2f(-0.4, -0.7f);
+	// bottom right
+	glVertex2f(0.4, -0.7f);
+	// top right
+	glVertex2f(0.25, -0.5f);
+	// top left
+	glVertex2f(-0.25, -0.5f);
+	
+	glEnd();
+
 }
 
 void drawSnowman(void) {
