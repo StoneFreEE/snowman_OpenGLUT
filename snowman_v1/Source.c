@@ -43,6 +43,7 @@ unsigned int frameStartTime = 0;
 
 #define KEY_EXIT			27 // Escape key.
 #define KEY_PARTICLE_ONOFF  's' // s key
+#define KEY_LASER		    'l' // l key
 
 
 /******************************************************************************
@@ -61,6 +62,10 @@ void idle(void);
 void main(int argc, char** argv);
 void init(void);
 void think(void);
+
+// LASER FUNCTIONS
+void drawLaser();
+void updateLaser();
 
 // PARTICLE SYSTEM FUNCTIONS
 void initParticleSystem();
@@ -94,7 +99,7 @@ void drawSnowman(void);
  ******************************************************************************/
 
  // PARTICLES
-#define MAX_PARTICLES 75
+#define MAX_PARTICLES 100
 
 int lastUsedParticle = -1;
 int particleSystemActive = 0; // particle system initally inactive
@@ -128,6 +133,11 @@ GLfloat colours[5][3] = { {168.0f / 255.0f, 100 / 255.0f,253 / 255.0f}, // purpl
 float pAlpha = 1.0f;
 float deltaTime = 0;
 Particle_t particleSystem[MAX_PARTICLES];
+
+// LASER SETUP
+
+int laserActive = 0; // laser initally inactive
+GLfloat laserVertices[4][2] = { {-0.05f, 0.1f}, {0.0f, 0.05f}, {1.0f, 0.5f}, {1.0f, 1.0f} }; // bottom left, bottom right, top right, top left vertex coordinates
 
 
  // GROUND SETUP
@@ -191,13 +201,13 @@ void display(void)
 
 	drawGround();
 
+	drawParticleSystem();
+
 	drawPlatform();
 
 	drawSnowman();
 
 	displayDiagnostics();
-
-	drawParticleSystem();
 
 	glutSwapBuffers();
 	/*
@@ -243,7 +253,14 @@ void keyPressed(unsigned char key, int x, int y)
 			spawnDelay = 0.3f;
 		}
 		break;
-
+	case KEY_LASER:
+		if (laserActive) {
+			laserActive = 0;
+		}
+		else {
+			laserActive = 1;
+		}
+		break;
 	}
 }
 
@@ -313,6 +330,7 @@ void init(void)
 void think(void)
 {
 	updateParticleSystem(FRAME_TIME_SEC);
+	updateLaser();
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR ANIMATION/SIMULATION CODE
 
@@ -354,7 +372,22 @@ void think(void)
 	*/
 }
 
+// LASER FUNCTION
+void drawLaser() {
+	// set color to red and alpha to 0.2 
+	glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
+	glBegin(GL_POLYGON);
+	for (int i = 0; i < 4; i++) {
+		glVertex2f(laserVertices[i][0], laserVertices[i][1]);
+	}
+	glEnd();
+}
 
+void updateLaser() {
+	if (laserActive) {
+
+	}
+}
 
 // PARTICLE SYSTEM FUNCTIONS
 
@@ -384,11 +417,12 @@ void spawnParticle(int index) {
 	particleSystem[index].size = ((double)rand() / RAND_MAX) * (10.0 - 5.0) + 5.0;
 	particleSystem[index].dy = ((double)rand() / RAND_MAX * 0.4 + 0.1) * particleSystem[index].size / 10; // random num between 0.1-0.4 * particle size / 10
 	particleSystem[index].life = 0.0f;
-	particleSystem[index].alpha = 1.0f;
+	particleSystem[index].alpha = ((double)rand() / RAND_MAX * 1.0 + 0.5); // random num between 0.5-1.0
 	for (int i = 0; i < 3; i++) {
 		particleSystem[index].colour[i] = colours[colourindex][i];
 	}
 	particleSystem[index].active = 1;
+	particleCounter++;
 }
 
 void updateParticleSystem(float deltaTime) {
@@ -403,11 +437,7 @@ void updateParticleSystem(float deltaTime) {
 			i = (i + 1) % MAX_PARTICLES;
 			if (!particleSystem[i].active && particleSpawnTimer >= spawnDelay) {
 				spawnParticle(i);
-				// increment particle counter
-				if (particleCounter < MAX_PARTICLES) {
-					particleCounter++;
-				}
-				spawnDelay -= deltaTime * 0.2f;
+				spawnDelay -= deltaTime * 0.1f; 
 				particleSpawnTimer = 0.0f;
 				if (spawnDelay < 0.0f) {
 					spawnDelay = 0.0f; // Ensure particle spawn rate doesn't become negative
@@ -427,9 +457,8 @@ void updateParticleSystem(float deltaTime) {
 			p->life += deltaTime;
 			if (p->position.y <= -1.0f) {
 				p->active = 0;
-				if (!particleSystemActive) { particleCounter--; };
+				particleCounter--;
 			}
-			p->alpha = (p->position.y + 1.0f) / 1.0f;
 		}
 	}
 }
@@ -448,9 +477,10 @@ void drawParticleSystem() {
 
 
 // DIAGNOSTICS FUNCTION
+
 void displayDiagnostics(void){
 	char text[256]; // Allocate a buffer to hold the formatted string
-	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n s: toggle confetti\n ESC: exit", particleCounter, MAX_PARTICLES);
+	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n ESC: exit", particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER);
 
 	glColor3f(0.0f, 0.0f, 0.0f);
 	// Set the position for the text
@@ -461,7 +491,7 @@ void displayDiagnostics(void){
 }
 
 
-// BACKGROUND AND CHARACTER FUNCTIONS
+// BACKGROUND DRAWING FUNCTIONS
 
 void drawSky() {
 	// draw sky
@@ -548,6 +578,8 @@ void drawPlatform(void) {
 
 }
 
+// SNOWMAN DRAWING FUNCTIONS
+
 void drawSnowman(void) {
 	drawLegs();
 	drawArms();
@@ -558,12 +590,15 @@ void drawSnowman(void) {
 void drawDetails(void) {
 	// set color to black and draw eyes
 	glColor3f(0.0, 0.0, 0.0);
+
 	// right eye small circle guy
 	drawCircle(-0.18, 0.25, 0.015);
 	// left eye small circle guy
 	drawCircle(-0.215, 0.2, 0.015);
+
 	// outer big circle eye
 	drawCircle(0.0, 0.1, 0.1);
+
 	// right hand left eye
 	drawCircle(0.3, -0.3, 0.015);
 	// right hand right eye
@@ -573,6 +608,9 @@ void drawDetails(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	// white big circle eye
 	drawCircle(0.0, 0.1, 0.065);
+	if (laserActive) {
+		drawLaser();
+	}
 
 	// set color to black 
 	glColor3f(0.0, 0.0, 0.0);
