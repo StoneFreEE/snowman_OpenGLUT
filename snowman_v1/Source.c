@@ -139,7 +139,7 @@ Particle_t particleSystem[MAX_PARTICLES];
 // laser rotation angle
 GLfloat laserRotation = 0.0f;
 int laserActive = 0; // laser initally inactive
-GLfloat laserVertices[4][2] = { {-0.05f, 0.1f}, {0.0f, 0.05f}, {1.0f, 0.5f}, {1.0f, 1.0f} }; // bottom left, bottom right, top right, top left vertex coordinates
+GLfloat laserVertices[4][2] = { {-0.05f, 0.01f}, {0.0f, 0.0f}, {1.5f, 0.5f}, {1.5f, 1.5f} }; // bottom left, bottom right, top right, top left vertex coordinates
 
 
  // GROUND SETUP
@@ -376,6 +376,12 @@ void think(void)
 
 // LASER FUNCTION
 void drawLaser() {
+	// save the current matrix
+	glPushMatrix();
+
+	// rotate the laser around the z-axis by the current rotation angle
+	glTranslatef(0.0f, 0.1f, 0.0f);
+	glRotatef(laserRotation, 0.0f, 0.0f, 1.0f);
 
 	// set color to red and alpha to 0.4 
 	glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
@@ -384,12 +390,14 @@ void drawLaser() {
 		glVertex2f(laserVertices[i][0], laserVertices[i][1]);
 	}
 	glEnd();
+	// restore the previous matrix
+	glPopMatrix();
 
 	updateLaser();
 }
 
 void updateLaser() {
-
+	laserRotation += 90 * FRAME_TIME_SEC;
 }
 
 // PARTICLE SYSTEM FUNCTIONS
