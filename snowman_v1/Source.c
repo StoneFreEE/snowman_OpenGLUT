@@ -63,9 +63,14 @@ void main(int argc, char** argv);
 void init(void);
 void think(void);
 
+// BIRD FUNCTIONS
+void drawBird();
+void updateBird();
+
 // LASER FUNCTIONS
 void drawLaser();
 void updateLaser();
+int linesIntersectX(float line1X1, float line1X2, float line2X1, float line2X2);
 
 // PARTICLE SYSTEM FUNCTIONS
 void initParticleSystem();
@@ -130,16 +135,27 @@ GLfloat colours[5][3] = { {168.0f / 255.0f, 100 / 255.0f,253 / 255.0f}, // purpl
 						  {253 / 255.0f, 255 / 255.0f,106 / 255.0f} // yellow
 };
 
-float pAlpha = 1.0f;
-float deltaTime = 0;
 Particle_t particleSystem[MAX_PARTICLES];
 
+// BIRD SETUP
+GLfloat birdX = -0.9f;
+int birdDead = 0; // bird is initally not dead
+
+// Define the two lines for the bird
+float birdLine1[4];
+float birdLine2[4];
+
 // LASER SETUP
+GLfloat laserbtmX = 0.0f;
+GLfloat lasertopX = 0.0f;
+GLfloat laserbtmX2 = 0.0f;
+GLfloat lasertopX2 = 0.0f;
 
 // laser rotation angle
+GLfloat laserX = 0.0f;
 GLfloat laserRotation = 0.0f;
 int laserActive = 0; // laser initally inactive
-GLfloat laserVertices[4][2] = { {-0.05f, 0.01f}, {0.0f, 0.0f}, {1.5f, 0.5f}, {1.5f, 1.5f} }; // bottom left, bottom right, top right, top left vertex coordinates
+GLfloat laserVertices[4][2] = { {-0.05f, 0.01f}, {0.0f, 0.0f}, {2.0f, -0.7f}, {2.0f, 0.0f} }; // bottom left, bottom right, top right, top left vertex coordinates
 
 
  // GROUND SETUP
@@ -202,6 +218,8 @@ void display(void)
 	drawSky();
 
 	drawGround();
+
+	drawBird();
 
 	drawParticleSystem();
 
@@ -319,6 +337,7 @@ void init(void)
 
 	// initialise ground
 	initGround();
+
 }
 
 /*
@@ -333,6 +352,7 @@ void think(void)
 {
 	updateParticleSystem(FRAME_TIME_SEC);
 	updateLaser();
+	updateBird();
 	/*
 		TEMPLATE: REPLACE THIS COMMENT WITH YOUR ANIMATION/SIMULATION CODE
 
@@ -374,30 +394,132 @@ void think(void)
 	*/
 }
 
+// BIRD FUNCTIONS
+
+void drawBird() {
+
+	glPushMatrix();
+
+	glTranslatef(birdX, 0.1f, 0.0f);
+
+	if (birdDead && laserActive) {
+		// draw beak
+		glColor3f(102.0f / 255.0, 102.0f / 255.0, 102.0f / 255.0);
+		glBegin(GL_TRIANGLES);
+		glVertex2f(0.05f, 0.75f); // top
+		glVertex2f(0.15f, 0.7f); // right
+		glVertex2f(0.05f, 0.65f); // bottom
+		glEnd();
+
+		// draw body
+		glColor3f(82.0f / 255.0, 82.0f / 255.0, 82.0f / 255.0);
+		drawCircle(0.0, 0.7, 0.085);
+
+		// draw eye
+		glColor3f(0.0f, 0.0f, 0.0);
+		drawCircle(0.035, 0.73, 0.015);
+	}
+	else {
+		// draw beak
+		glColor3f(227.0f / 255.0, 201.0f / 255.0, 86.0f / 255.0);
+		glBegin(GL_TRIANGLES);
+		glVertex2f(0.05f, 0.75f); // top
+		glVertex2f(0.15f, 0.7f); // right
+		glVertex2f(0.05f, 0.65f); // bottom
+		glEnd();
+
+		// draw body
+		glColor3f(86.0f / 255.0, 140.0f / 255.0, 227.0f / 255.0);
+		drawCircle(0.0, 0.7, 0.085);
+
+		// draw eye
+		glColor3f(0.0f, 0.0f, 0.0);
+		drawCircle(0.035, 0.73, 0.015);
+	}
+
+	glPopMatrix();
+}
+
+void updateBird() {
+	birdX += .6f * FRAME_TIME_SEC;
+
+	if (birdX >= 1.15f) {
+		birdX = -1.15f;
+	}
+	// btm line
+	birdLine1[0] = birdX - 0.085;
+	birdLine1[1] = 0.61f + 0.1f;
+	birdLine1[2] = birdX + 0.07;
+	birdLine1[3] = 0.61f + 0.1f;
+
+	// right line
+	birdLine2[0] = birdX + 0.14;
+	birdLine2[1] = 0.67 + 0.1f;
+	birdLine2[2] = birdX + 0.14;
+	birdLine2[3] = 0.7f + 0.1f;
+
+	int intersect1 = linesIntersectX(birdLine1[0], birdLine1[2], laserbtmX, laserbtmX2);
+	int intersect2 = linesIntersectX(birdLine2[0], birdLine2[2], lasertopX, lasertopX2);
+
+	if ((laserRotation <= 180 && laserRotation >= 0) && (intersect1 || intersect2 )) {
+		birdDead = 1;
+	}
+	else {
+		birdDead = 0;
+	}
+	
+}
+
 // LASER FUNCTION
 void drawLaser() {
+	glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
+
 	// save the current matrix
 	glPushMatrix();
 
 	// rotate the laser around the z-axis by the current rotation angle
 	glTranslatef(0.0f, 0.1f, 0.0f);
 	glRotatef(laserRotation, 0.0f, 0.0f, 1.0f);
-
 	// set color to red and alpha to 0.4 
-	glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < 4; i++) {
 		glVertex2f(laserVertices[i][0], laserVertices[i][1]);
 	}
 	glEnd();
+
+	laserbtmX = (0.61f / tan(laserRotation / 180 * 3.14f));
+	laserbtmX2 = laserbtmX + 0.2f;
+	lasertopX = (0.7f / tan(laserRotation / 180 * 3.14f));
+	lasertopX2 = lasertopX + 0.205f;
+
 	// restore the previous matrix
 	glPopMatrix();
 
-	updateLaser();
 }
 
 void updateLaser() {
-	laserRotation += 90 * FRAME_TIME_SEC;
+	if (laserActive) {
+		if (laserRotation >= 360) {
+			laserRotation = 0;
+		}
+		laserRotation += 90 * FRAME_TIME_SEC;
+	}
+}
+
+int linesIntersectX(float line1X1, float line1X2, float line2X1, float line2X2) {
+	// Find the minimum and maximum x-coordinates of each line segment
+	float line1MinX = fmin(line1X1, line1X2);
+	float line1MaxX = fmax(line1X1, line1X2);
+	float line2MinX = fmin(line2X1, line2X2);
+	float line2MaxX = fmax(line2X1, line2X2);
+
+	// Check if the x-coordinate ranges of the two lines overlap
+	if (line1MaxX >= line2MinX && line1MinX <= line2MaxX) {
+		return 1; // The lines intersect in their x-coordinates
+	}
+	else {
+		return 0; // The lines do not intersect in their x-coordinates
+	}
 }
 
 // PARTICLE SYSTEM FUNCTIONS
@@ -491,7 +613,8 @@ void drawParticleSystem() {
 
 void displayDiagnostics(void){
 	char text[256]; // Allocate a buffer to hold the formatted string
-	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n ESC: exit", particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER);
+	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n ESC: exit", 
+		particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER);
 
 	glColor3f(0.0f, 0.0f, 0.0f);
 	// Set the position for the text
@@ -619,6 +742,7 @@ void drawDetails(void) {
 	glColor3f(1.0, 1.0, 1.0);
 	// white big circle eye
 	drawCircle(0.0, 0.1, 0.065);
+
 	if (laserActive) {
 		drawLaser();
 	}
