@@ -44,6 +44,7 @@ unsigned int frameStartTime = 0;
 #define KEY_EXIT			27 // Escape key.
 #define KEY_PARTICLE_ONOFF  's' // s key
 #define KEY_LASER		    'l' // l key
+#define KEY_HAT			    'h' // h key
 
 
 /******************************************************************************
@@ -63,6 +64,10 @@ void main(int argc, char** argv);
 void init(void);
 void think(void);
 
+// HAT FUNCTIONS
+void updateHatAnimation();
+void drawWavingGuy();
+
 // BIRD FUNCTIONS
 void drawBird();
 void updateBird();
@@ -81,7 +86,7 @@ void spawnParticle(int index);
 
 void displayDiagnostics(void);
 
-// background drawing functions
+// BACKGROUND FUNCTIONS
 void drawSky(void);
 
 void initGround(void);
@@ -89,21 +94,23 @@ void drawGround(void);
 
 void drawPlatform(void);
 
-// snowman helper functions
+// SNOWMAN HELPER FUNCTIONS
 void drawHead(void);
 void drawLegs(void);
 void drawArms(void);
 void drawDetails(void);
+void drawHat(void);
 
 void drawCircle(GLfloat x, GLfloat y, float radius);
 
+// SNOWMAN FUNCTION
 void drawSnowman(void);
 
 /******************************************************************************
  * Animation-Specific Setup (Add your own definitions, constants, and globals here)
  ******************************************************************************/
 
- // PARTICLES
+ // PARTICLES SETUP
 #define MAX_PARTICLES 100
 
 int lastUsedParticle = -1;
@@ -137,6 +144,27 @@ GLfloat colours[5][3] = { {168.0f / 255.0f, 100 / 255.0f,253 / 255.0f}, // purpl
 
 Particle_t particleSystem[MAX_PARTICLES];
 
+// HAT SETUP
+GLfloat hatVertices[4][2] = {
+	{-0.07f, 0.34f},
+	{0.07f, 0.34f},
+	{0.08f, 0.44f},
+	{-0.08f, 0.44f}
+};
+
+GLfloat bottomHatVertices[2][2] = {
+	{-0.1f, 0.32f},
+	{0.1f, 0.32f}
+};
+
+int hatActive = 0; // hat is initially inactive
+
+GLfloat hatguyYPos = 0.0f;
+GLfloat hatguyArmRotation= 0.0f;
+GLfloat hatguyJoint1X = 0.0f;
+GLfloat hatguyHandRadius = 0.0f;
+int hitMaxRotation = 0;
+
 // BIRD SETUP
 GLfloat birdX = -0.9f;
 int birdDead = 0; // bird is initally not dead
@@ -156,7 +184,6 @@ GLfloat laserX = 0.0f;
 GLfloat laserRotation = 0.0f;
 int laserActive = 0; // laser initally inactive
 GLfloat laserVertices[4][2] = { {-0.05f, 0.01f}, {0.0f, 0.0f}, {2.0f, -0.7f}, {2.0f, 0.0f} }; // bottom left, bottom right, top right, top left vertex coordinates
-
 
  // GROUND SETUP
 
@@ -225,20 +252,13 @@ void display(void)
 
 	drawPlatform();
 
+	drawWavingGuy();
+
 	drawSnowman();
 
 	displayDiagnostics();
 
 	glutSwapBuffers();
-	/*
-		TEMPLATE: REPLACE THIS COMMENT WITH YOUR DRAWING CODE
-
-		Separate reusable pieces of drawing code into functions, which you can add
-		to the "Animation-Specific Functions" section below.
-
-		Remember to add prototypes for any new functions to the "Animation-Specific
-		Function Prototypes" section near the top of this template.
-	*/
 }
 
 /*
@@ -254,12 +274,6 @@ void reshape(int width, int h)
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (tolower(key)) {
-		/*
-			TEMPLATE: Add any new character key controls here.
-
-			Rather than using literals (e.g. "d" for diagnostics), create a new KEY_
-			definition in the "Keyboard Input Handling Setup" section of this file.
-		*/
 	case KEY_EXIT:
 		exit(0);
 		break;
@@ -281,6 +295,13 @@ void keyPressed(unsigned char key, int x, int y)
 			laserActive = 1;
 		}
 		break;
+	case KEY_HAT:
+		if (hatActive) {
+			hatActive = 0;
+		}
+		else {
+			hatActive = 1;
+		}
 	}
 }
 
@@ -353,45 +374,119 @@ void think(void)
 	updateParticleSystem(FRAME_TIME_SEC);
 	updateLaser();
 	updateBird();
-	/*
-		TEMPLATE: REPLACE THIS COMMENT WITH YOUR ANIMATION/SIMULATION CODE
+	updateHatAnimation();
+}
 
-		In this function, we update all the variables that control the animated
-		parts of our simulated world. For example: if you have a moving box, this is
-		where you update its coordinates to make it move. If you have something that
-		spins around, here's where you update its angle.
 
-		NOTHING CAN BE DRAWN IN HERE: you can only update the variables that control
-		how everything will be drawn later in display().
+// HAT ANIMATION FUNCTIONS
 
-		How much do we move or rotate things? Because we use a fixed frame rate, we
-		assume there's always FRAME_TIME milliseconds between drawing each frame. So,
-		every time think() is called, we need to work out how far things should have
-		moved, rotated, or otherwise changed in that period of time.
+void drawWavingGuy() {
+	// draw circle inside head, then make it come out slightly
+	if (hatActive) {
 
-		Movement example:
-		* Let's assume a distance of 1.0 GL units is 1 metre.
-		* Let's assume we want something to move 2 metres per second on the x axis
-		* Each frame, we'd need to update its position like this:
-			x += 2 * (FRAME_TIME / 1000.0f)
-		* Note that we have to convert FRAME_TIME to seconds. We can skip this by
-		  using a constant defined earlier in this template:
-			x += 2 * FRAME_TIME_SEC;
+		glPushMatrix();
+		glTranslatef(0.09f, hatguyYPos - 0.04, 0.0f);
+		glRotatef(hatguyArmRotation, 0.0f, 0.0f, 1.0f);
 
-		Rotation example:
-		* Let's assume we want something to do one complete 360-degree rotation every
-		  second (i.e. 60 Revolutions Per Minute, or RPM).
-		* Each frame, we'd need to update our object's angle like this (we'll use the
-		  FRAME_TIME_SEC constant as per the example above):
-			a += 360 * FRAME_TIME_SEC;
+		// draw arm
+		glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+		glLineWidth(15.0f);
+		glBegin(GL_LINES);
+		glVertex2f(0.0f, 0.0f);
+		glVertex2f(hatguyJoint1X - 0.09f, 0.04f);
+		glEnd();
 
-		This works for any type of "per second" change: just multiply the amount you'd
-		want to move in a full second by FRAME_TIME_SEC, and add or subtract that
-		from whatever variable you're updating.
+		// draw hand attached to arm
+		glPushMatrix();
+		glTranslatef(hatguyJoint1X - 0.09f, 0.04f, 0.0f);
+		drawCircle(0.0f, 0.0f, hatguyHandRadius);
+		glPopMatrix();
 
-		You can use this same approach to animate other things like color, opacity,
-		brightness of lights, etc.
-	*/
+		glPopMatrix();
+
+		// draw waving guy body top
+		glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+		drawCircle(0.0f, hatguyYPos, 0.1f);
+
+		// draw waving guy body bottom
+		glBegin(GL_POLYGON);
+		// bottom left
+		glVertex2f(-0.1f, 0.1f);
+		// bottom right
+		glVertex2f(0.1f, 0.1f);
+		// top right
+		glVertex2f(0.1f, hatguyYPos);
+		// top left
+		glVertex2f(-0.1f, hatguyYPos);
+		glEnd();
+
+		// draw waving guy eyes
+		glColor3f(0.0f, 0.0f, 0.0f);
+		drawCircle(0.05f, hatguyYPos, 0.015f);
+		drawCircle(-0.05f, hatguyYPos, 0.015f);
+
+	}
+}
+
+void updateHatAnimation() {
+	if (hatActive) {
+		// grow top of hat
+		if (hatVertices[2][1] <= 1.0f) {
+			hatVertices[2][1] += 1 * FRAME_TIME_SEC;
+			hatVertices[3][1] += 1 * FRAME_TIME_SEC;
+		}
+		// once hat fully grown, move bottom vertices up and move line up
+		if (hatVertices[2][1] >= 0.95f && bottomHatVertices[0][1] <= 0.5f) {
+			bottomHatVertices[0][1] += .5 * FRAME_TIME_SEC;
+			bottomHatVertices[1][1] += .5 * FRAME_TIME_SEC;
+			hatVertices[0][1] += .5 * FRAME_TIME_SEC;
+			hatVertices[1][1] += .5 * FRAME_TIME_SEC;
+		}
+		// update hat guy pos
+		if (hatguyYPos <= 0.38f) {
+			hatguyYPos += .45 * FRAME_TIME_SEC;
+		}
+		// if has guy fully grown, extend hat guy's first joint
+		if (hatguyYPos >= 0.37 && hatguyJoint1X <= 0.22) {
+			hatguyJoint1X += .5 * FRAME_TIME_SEC;
+		}
+		// once hat guy joint is fully grown, generate hand
+		if (hatguyJoint1X >= 0.21f && hatguyHandRadius <= 0.04) {
+			hatguyHandRadius += 0.1 * FRAME_TIME_SEC;
+		}
+		// once hand is fully generated, rotate arm 20 degrees anti clockwise and clockwise
+		if (hatguyHandRadius >= 0.039) {
+			// if arm rotation angle is greater than -45 and not hit max rotation, decrement until it reaches -45
+			if (hatguyArmRotation > -45 && !hitMaxRotation) {
+				hatguyArmRotation -= 90 * FRAME_TIME_SEC;
+				if (hatguyArmRotation <= -45) {
+					hitMaxRotation = 1;
+				}
+			}
+			// if arm rotation angle is less than 45 and hit max rotation, increment until it reaches 45
+			if (hatguyArmRotation < 45 && hitMaxRotation) {
+				hatguyArmRotation += 90 * FRAME_TIME_SEC;
+				if (hatguyArmRotation >= 45) {
+					hitMaxRotation = 0;
+				}
+			}
+
+		}
+	}
+	else {
+		// retract hand and arm
+		hatguyHandRadius = 0.0f;
+		hatguyJoint1X = 0.0f;
+		// retract hat and body
+		hatguyArmRotation = 0.0f;
+		hatVertices[2][1] = 0.44f;
+		hatVertices[3][1] = 0.44f;
+		hatVertices[0][1] = 0.34f;
+		hatVertices[1][1] = 0.34f;
+		bottomHatVertices[0][1] = 0.32f;
+		bottomHatVertices[1][1] = 0.32f;
+		hatguyYPos = 0.0f;
+	}
 }
 
 // BIRD FUNCTIONS
@@ -472,7 +567,6 @@ void updateBird() {
 
 // LASER FUNCTION
 void drawLaser() {
-	glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
 
 	// save the current matrix
 	glPushMatrix();
@@ -483,6 +577,7 @@ void drawLaser() {
 	// set color to red and alpha to 0.4 
 	glBegin(GL_POLYGON);
 	for (int i = 0; i < 4; i++) {
+		glColor4f(1.0f, 0.0f, 0.0f, 0.4f);
 		glVertex2f(laserVertices[i][0], laserVertices[i][1]);
 	}
 	glEnd();
@@ -613,8 +708,8 @@ void drawParticleSystem() {
 
 void displayDiagnostics(void){
 	char text[256]; // Allocate a buffer to hold the formatted string
-	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n ESC: exit", 
-		particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER);
+	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n %c Toggle hat!\n ESC: exit", 
+		particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER, KEY_HAT);
 
 	glColor3f(0.0f, 0.0f, 0.0f);
 	// Set the position for the text
@@ -743,15 +838,20 @@ void drawDetails(void) {
 	// white big circle eye
 	drawCircle(0.0, 0.1, 0.065);
 
+	drawHat();
+
 	if (laserActive) {
 		drawLaser();
 	}
-
 	// set color to black 
 	glColor3f(0.0, 0.0, 0.0);
 	// black inner big circle eye
 	drawCircle(0.0, 0.1, 0.05);
+}
 
+void drawHat() {
+	// set color to black 
+	glColor3f(0.0, 0.0, 0.0);
 	// set line width
 	glLineWidth(21.5f);
 
@@ -759,9 +859,9 @@ void drawDetails(void) {
 	glBegin(GL_LINES);
 
 	// bottom left
-	glVertex2f(-0.1, 0.32);
+	glVertex2f(bottomHatVertices[0][0], bottomHatVertices[0][1]);
 	// bottom right
-	glVertex2f(0.1, 0.32);
+	glVertex2f(bottomHatVertices[1][0], bottomHatVertices[1][1]);
 
 	glEnd();
 
@@ -769,13 +869,13 @@ void drawDetails(void) {
 	glBegin(GL_POLYGON);
 
 	// bottom left
-	glVertex2f(-0.07, 0.33);
+	glVertex2f(hatVertices[0][0], hatVertices[0][1]);
 	// bottom right
-	glVertex2f(0.07, 0.34);
+	glVertex2f(hatVertices[1][0], hatVertices[1][1]);
 	// top right
-	glVertex2f(0.08, 0.44);
+	glVertex2f(hatVertices[2][0], hatVertices[2][1]);
 	// top left
-	glVertex2f(-0.08, 0.44);
+	glVertex2f(hatVertices[3][0], hatVertices[3][1]);
 	glEnd();
 }
 
