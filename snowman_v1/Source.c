@@ -45,6 +45,8 @@ unsigned int frameStartTime = 0;
 #define KEY_PARTICLE_ONOFF  's' // s key
 #define KEY_LASER		    'l' // l key
 #define KEY_HAT			    'h' // h key
+#define KEY_EXIT2			'q' // q key
+#define KEY_DIAGNOSTICS	    'd' // d key
 
 
 /******************************************************************************
@@ -165,6 +167,9 @@ GLfloat hatguyJoint1X = 0.0f;
 GLfloat hatguyHandRadius = 0.0f;
 int hitMaxRotation = 0;
 
+// DIAGNOSTICS SETUP
+int diagnosticsActive = 1; // initially active
+
 // BIRD SETUP
 GLfloat birdX = -0.9f;
 int birdDead = 0; // bird is initally not dead
@@ -278,6 +283,18 @@ void keyPressed(unsigned char key, int x, int y)
 		exit(0);
 		break;
 
+	case KEY_EXIT2:
+		exit(0);
+		break;
+
+	case KEY_DIAGNOSTICS:
+		if (diagnosticsActive) {
+			diagnosticsActive = 0;
+		}
+		else {
+			diagnosticsActive = 1;
+		}
+		break;
 	case KEY_PARTICLE_ONOFF:
 		if (particleSystemActive == 1) {
 			particleSystemActive = 0;
@@ -707,16 +724,18 @@ void drawParticleSystem() {
 // DIAGNOSTICS FUNCTION
 
 void displayDiagnostics(void){
-	char text[256]; // Allocate a buffer to hold the formatted string
-	snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n %c Toggle hat!\n ESC: exit", 
-		particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER, KEY_HAT);
+	if (diagnosticsActive) {
+		char text[256]; // Allocate a buffer to hold the formatted string
+		snprintf(text, sizeof(text), "Diagnostics\n particles %d of %d\nScene controls:\n %c: Toggle confetti\n %c: Toggle laser\n %c Toggle hat!\n %c Toggle Diagnostics\n ESC/q: exit",
+			particleCounter, MAX_PARTICLES, KEY_PARTICLE_ONOFF, KEY_LASER, KEY_HAT, KEY_DIAGNOSTICS);
 
-	glColor3f(0.0f, 0.0f, 0.0f);
-	// Set the position for the text
-	glRasterPos2f(-0.99f, 0.95f);
+		glColor3f(0.0f, 0.0f, 0.0f);
+		// Set the position for the text
+		glRasterPos2f(-0.99f, 0.95f);
 
-	// Render the text 
-	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text);
+		// Render the text 
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text);
+	}
 }
 
 
@@ -1015,4 +1034,5 @@ void drawHead(void) {
 	}
 	glEnd();
 }
+
 /******************************************************************************/
