@@ -399,50 +399,46 @@ void think(void)
 
 void drawWavingGuy() {
 	// draw circle inside head, then make it come out slightly
-	if (hatActive) {
+	glPushMatrix();
+	glTranslatef(0.09f, hatguyYPos - 0.04, 0.0f);
+	glRotatef(hatguyArmRotation, 0.0f, 0.0f, 1.0f);
 
-		glPushMatrix();
-		glTranslatef(0.09f, hatguyYPos - 0.04, 0.0f);
-		glRotatef(hatguyArmRotation, 0.0f, 0.0f, 1.0f);
+	// draw arm
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+	glLineWidth(15.0f);
+	glBegin(GL_LINES);
+	glVertex2f(0.0f, 0.0f);
+	glVertex2f(hatguyJoint1X - 0.09f, 0.04f);
+	glEnd();
 
-		// draw arm
-		glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
-		glLineWidth(15.0f);
-		glBegin(GL_LINES);
-		glVertex2f(0.0f, 0.0f);
-		glVertex2f(hatguyJoint1X - 0.09f, 0.04f);
-		glEnd();
+	// draw hand attached to arm
+	glPushMatrix();
+	glTranslatef(hatguyJoint1X - 0.09f, 0.04f, 0.0f);
+	drawCircle(0.0f, 0.0f, hatguyHandRadius);
+	glPopMatrix();
 
-		// draw hand attached to arm
-		glPushMatrix();
-		glTranslatef(hatguyJoint1X - 0.09f, 0.04f, 0.0f);
-		drawCircle(0.0f, 0.0f, hatguyHandRadius);
-		glPopMatrix();
+	glPopMatrix();
 
-		glPopMatrix();
+	// draw waving guy body top
+	glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
+	drawCircle(0.0f, hatguyYPos, 0.1f);
 
-		// draw waving guy body top
-		glColor3f(239.0 / 255.0, 143.0 / 255.0, 60.0 / 255.0);
-		drawCircle(0.0f, hatguyYPos, 0.1f);
+	// draw waving guy body bottom
+	glBegin(GL_POLYGON);
+	// bottom left
+	glVertex2f(-0.1f, 0.1f);
+	// bottom right
+	glVertex2f(0.1f, 0.1f);
+	// top right
+	glVertex2f(0.1f, hatguyYPos);
+	// top left
+	glVertex2f(-0.1f, hatguyYPos);
+	glEnd();
 
-		// draw waving guy body bottom
-		glBegin(GL_POLYGON);
-		// bottom left
-		glVertex2f(-0.1f, 0.1f);
-		// bottom right
-		glVertex2f(0.1f, 0.1f);
-		// top right
-		glVertex2f(0.1f, hatguyYPos);
-		// top left
-		glVertex2f(-0.1f, hatguyYPos);
-		glEnd();
-
-		// draw waving guy eyes
-		glColor3f(0.0f, 0.0f, 0.0f);
-		drawCircle(0.05f, hatguyYPos, 0.015f);
-		drawCircle(-0.05f, hatguyYPos, 0.015f);
-
-	}
+	// draw waving guy eyes
+	glColor3f(0.0f, 0.0f, 0.0f);
+	drawCircle(0.05f, hatguyYPos, 0.015f);
+	drawCircle(-0.05f, hatguyYPos, 0.015f);
 }
 
 void updateHatAnimation() {
@@ -460,7 +456,7 @@ void updateHatAnimation() {
 			hatVertices[1][1] += .5 * FRAME_TIME_SEC;
 		}
 		// update hat guy pos
-		if (hatguyYPos <= 0.38f) {
+		if (hatguyYPos <= 0.38f && (hatguyYPos + 0.1f) < hatVertices[0][1]) {
 			hatguyYPos += .45 * FRAME_TIME_SEC;
 		}
 		// if has guy fully grown, extend hat guy's first joint
@@ -492,17 +488,29 @@ void updateHatAnimation() {
 	}
 	else {
 		// retract hand and arm
-		hatguyHandRadius = 0.0f;
-		hatguyJoint1X = 0.0f;
-		// retract hat and body
 		hatguyArmRotation = 0.0f;
-		hatVertices[2][1] = 0.44f;
-		hatVertices[3][1] = 0.44f;
-		hatVertices[0][1] = 0.34f;
-		hatVertices[1][1] = 0.34f;
-		bottomHatVertices[0][1] = 0.32f;
-		bottomHatVertices[1][1] = 0.32f;
-		hatguyYPos = 0.0f;
+		if (hatguyHandRadius > 0.0f) {
+			hatguyHandRadius -= 0.1 * FRAME_TIME_SEC;
+		}
+		if (hatguyHandRadius <= 0.0f && hatguyJoint1X > 0.0f) {
+			hatguyJoint1X -= .5f * FRAME_TIME_SEC;
+		}
+		// retract guy y and hat base
+		if (hatguyJoint1X <= 0.0f && hatguyYPos > 0.0f) {
+			hatguyYPos -= .45f * FRAME_TIME_SEC;
+			if (bottomHatVertices[0][1] > 0.32f) {
+				bottomHatVertices[0][1] -= .5 * FRAME_TIME_SEC;
+				bottomHatVertices[1][1] -= .5 * FRAME_TIME_SEC;
+				if (hatVertices[0][1] > 0.33 && hatVertices[0][1] > bottomHatVertices[0][1]) {
+					hatVertices[0][1] -= 1 * FRAME_TIME_SEC;
+					hatVertices[1][1] -= 1 * FRAME_TIME_SEC;
+				}
+			}
+			if (hatVertices[2][1] > 0.44) {
+				hatVertices[2][1] -= 1 * FRAME_TIME_SEC;
+				hatVertices[3][1] -= 1 * FRAME_TIME_SEC;
+			}
+		}
 	}
 }
 
